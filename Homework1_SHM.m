@@ -10,9 +10,9 @@ RandStream.setGlobalStream(rng_stream);
 set(groot,'defaultAxesTickLabelInterpreter','latex'); 
 set(groot,'defaultLegendInterpreter','latex');
 set(groot,'defaultTextInterpreter','latex');
-txtsize = 18;           % Text Size of Plots
-marker = 8;             % Marker Size
-reduction = 0.01;      % Reduction in percentage for stiffness
+txtsize = 28;           % Text Size of Plots
+marker = 10;             % Marker Size
+reduction = 0.07;      % Reduction in percentage for stiffness
 
 %% HEALTHY MODEL
 m = 1;               % Mass [kg]
@@ -92,12 +92,12 @@ end
 % Temporal Signals
 figure
 set(gcf,'Units','Normalized','OuterPosition',[0 0 1 0.6]);
-plot(t,squeeze(yh(4,:)),'b','linewidth',2), hold on     % Analysis of arbitrary signal
-plot(t,squeeze(yd(4,:,1)),'r','linewidth', 1)
-plot(t,squeeze(yd(4,:,2)),'k','linewidth', 1) 
-plot(t,squeeze(yd(4,:,3)),'g','linewidth', 1)
-plot(t,squeeze(yd(4,:,4)),'c','linewidth', 1)
-plot(t,squeeze(yd(4,:,5)),'m','linewidth', 1)
+plot(t,squeeze(yh(23,:)),'b','linewidth',2), hold on     % Analysis of arbitrary signal
+plot(t,squeeze(yd(23,:,1)),'r','linewidth', 1)
+plot(t,squeeze(yd(23,:,2)),'k','linewidth', 1) 
+plot(t,squeeze(yd(23,:,3)),'g','linewidth', 1)
+plot(t,squeeze(yd(23,:,4)),'--c','linewidth', 1)
+plot(t,squeeze(yd(23,:,5)),'m','linewidth', 1)
 xlabel('Time [s]')
 ylabel('y [m]')
 grid on, grid minor
@@ -108,11 +108,11 @@ xlim([0 t(N)])
 figure
 set(gcf,'Units','Normalized','OuterPosition',[0 0 1 1])
 semilogy(PSDfreq,Y,'b','linewidth',2), hold on
-semilogy(PSDfreq,squeeze(Yd(4,:,1)), 'r','linewidth', 2)
-semilogy(PSDfreq,squeeze(Yd(4,:,2)), 'k','linewidth', 2)
-semilogy(PSDfreq,squeeze(Yd(4,:,3)), 'g','linewidth', 2)
-semilogy(PSDfreq,squeeze(Yd(4,:,4)), 'c','linewidth', 2)
-semilogy(PSDfreq,squeeze(Yd(4,:,5)), 'm','linewidth', 2)
+semilogy(PSDfreq,squeeze(Yd(23,:,1)), 'r','linewidth', 2)
+semilogy(PSDfreq,squeeze(Yd(23,:,2)), 'k','linewidth', 2)
+semilogy(PSDfreq,squeeze(Yd(23,:,3)), 'g','linewidth', 2)
+semilogy(PSDfreq,squeeze(Yd(23,:,4)), 'c','linewidth', 2)
+semilogy(PSDfreq,squeeze(Yd(23,:,5)), 'm','linewidth', 2)
 xlabel('Frequency [Hz]')
 ylabel('Y [m$^2$/Hz]')
 set(gca,'fontsize',txtsize,'XColor','k','YColor','k','ZColor','k','GridColor','k')
@@ -134,7 +134,7 @@ grid on, grid minor
 axis([PSDfreq(170) PSDfreq(210) 1e-5 1e-1])
 
 %% COMPUTING FEATURES
-% VARIANCE, KURTOSIS, NORM, SKEWNESS, RMS AND GAMMA
+% VARIANCE, KURTOSIS, SKEWNESS, RMS AND GAMMA
 ref = var(y);
 for k = 1:rep
     Varh(k) = var(squeeze(yh(k,:))); %#ok<*SAGROW>
@@ -324,7 +324,6 @@ semilogy(valid,Disthv,'xk','MarkerSize',marker,'linewidth',2), hold on
 semilogy(rep+1:rep+5*rep,Distd,'dk','MarkerSize',marker,'MarkerFaceColor','r')
 yline(max(Disth),'--k','linewidth',2.5)
 yline(UCL,'k-.','linewidth', 2.5)
-yline((UCL+max(Disth))/2,'m:','linewidth', 2.5)
 grid on, grid minor
 xlabel('Tests') 
 ylabel('$\mathcal D^2$')
@@ -386,32 +385,6 @@ fprintf('PROBABILITY OF DETECTION (Empirical): %.1f%% \n',100*Re)
 fprintf('FALSE NEGATIVE PERCENTAGE (Empirical): %.1f%% \n',pfn)
 fprintf('FALSE POSITIVE PERCENTAGE (Empirical): %.1f%% \n\n',pfp)
 
-% PROPOSED BY AUTHOR
-fp = 0; % FALSE POSITIVE
-for i=1:length(valid)
-    if Disthv(i)>(UCL+max(Disth))/2
-        fp = 1+fp;
-    end
-end
-fn = 0; % FALSE NEGATIVE
-for i=1:5*rep
-    if Distd(i)<(UCL+max(Disth))/2
-        fn = 1+fn;
-    end
-end
-pfn = fn/(5*rep)*100;       % Rate of Error II
-pfp = fp/length(valid)*100; % Rate of Error I   
-tp = (5*rep)-fn;            % True Positive
-tn = length(valid)-fp;      % True Negative
-Pr = tp/(tp+fp);            % Precision 
-Re = tp/(tp+fn);            % Recall (Probability of Detecion)
-F1 = 2*(Pr*Re)/(Pr+Re);     % F1-score
-FPR = fp/(fp+tn);           % False Positive Rate
-TNR = tn/(fp+tn);           % True Negative Rate
-fprintf('PROBABILITY OF DETECTION (by Author): %.1f%% \n',100*Re)
-fprintf('FALSE NEGATIVE PERCENTAGE (by Author): %.1f%% \n',pfn)
-fprintf('FALSE POSITIVE PERCENTAGE (by Author): %.1f%% \n\n',pfp)
-
 %% NATURAL FREQUENCY & RMS
 % LEARNING DATA - RMS - HEALTHY
 Xh = NatFreqh(learn)';
@@ -454,7 +427,6 @@ semilogy(valid,Disthv,'xk','MarkerSize',marker,'linewidth',2), hold on
 semilogy(rep+1:rep+5*rep,Distd,'dk','MarkerSize',marker,'MarkerFaceColor','r')
 yline(max(Disth),'--k','linewidth',2.5)
 yline(UCL,'k-.','linewidth', 2.5)
-yline((UCL+max(Disth))/2,'m:','linewidth', 2.5)
 grid on, grid minor
 xlabel('Tests') 
 ylabel('$\mathcal D^2$')
@@ -516,32 +488,6 @@ fprintf('PROBABILITY OF DETECTION (Empirical): %.1f%% \n',100*Re)
 fprintf('FALSE NEGATIVE PERCENTAGE (Empirical): %.1f%% \n',pfn)
 fprintf('FALSE POSITIVE PERCENTAGE (Empirical): %.1f%% \n\n',pfp)
 
-% PROPOSED BY AUTHOR
-fp = 0; % FALSE POSITIVE
-for i=1:length(valid)
-    if Disthv(i)>(UCL+max(Disth))/2
-        fp = 1+fp;
-    end
-end
-fn = 0; % FALSE NEGATIVE
-for i=1:5*rep
-    if Distd(i)<(UCL+max(Disth))/2
-        fn = 1+fn;
-    end
-end
-pfn = fn/(5*rep)*100;       % Rate of Error II
-pfp = fp/length(valid)*100; % Rate of Error I   
-tp = (5*rep)-fn;            % True Positive
-tn = length(valid)-fp;      % True Negative
-Pr = tp/(tp+fp);            % Precision 
-Re = tp/(tp+fn);            % Recall (Probability of Detecion)
-F1 = 2*(Pr*Re)/(Pr+Re);     % F1-score
-FPR = fp/(fp+tn);           % False Positive Rate
-TNR = tn/(fp+tn);           % True Negative Rate
-fprintf('PROBABILITY OF DETECTION (by Author): %.1f%% \n',100*Re)
-fprintf('FALSE NEGATIVE PERCENTAGE (by Author): %.1f%% \n',pfn)
-fprintf('FALSE POSITIVE PERCENTAGE (by Author): %.1f%% \n\n',pfp)
-
 %% NATURAL FREQUENCY & GAMMA
 % LEARNING DATA - GAMMA - HEALTHY
 Xh = NatFreqh(learn)';
@@ -584,7 +530,6 @@ semilogy(valid,Disthv,'xk','MarkerSize',marker,'linewidth',2), hold on
 semilogy(rep+1:rep+5*rep,Distd,'dk','MarkerSize',marker,'MarkerFaceColor','r')
 yline(max(Disth),'--k','linewidth',2.5)
 yline(UCL,'k-.','linewidth', 2.5)
-yline((UCL+max(Disth))/2,'m:','linewidth', 2.5)
 grid on, grid minor
 xlabel('Tests') 
 ylabel('$\mathcal D^2$')
@@ -646,32 +591,6 @@ fprintf('PROBABILITY OF DETECTION (Empirical): %.1f%% \n',100*Re)
 fprintf('FALSE NEGATIVE PERCENTAGE (Empirical): %.1f%% \n',pfn)
 fprintf('FALSE POSITIVE PERCENTAGE (Empirical): %.1f%% \n\n',pfp)
 
-% PROPOSED BY AUTHOR
-fp = 0; % FALSE POSITIVE
-for i=1:length(valid)
-    if Disthv(i)>(UCL+max(Disth))/2
-        fp = 1+fp;
-    end
-end
-fn = 0; % FALSE NEGATIVE
-for i=1:5*rep
-    if Distd(i)<(UCL+max(Disth))/2
-        fn = 1+fn;
-    end
-end
-pfn = fn/(5*rep)*100;       % Rate of Error II
-pfp = fp/length(valid)*100; % Rate of Error I   
-tp = (5*rep)-fn;            % True Positive
-tn = length(valid)-fp;      % True Negative
-Pr = tp/(tp+fp);            % Precision 
-Re = tp/(tp+fn);            % Recall (Probability of Detecion)
-F1 = 2*(Pr*Re)/(Pr+Re);     % F1-score
-FPR = fp/(fp+tn);           % False Positive Rate
-TNR = tn/(fp+tn);           % True Negative Rate
-fprintf('PROBABILITY OF DETECTION (by Author): %.1f%% \n',100*Re)
-fprintf('FALSE NEGATIVE PERCENTAGE (by Author): %.1f%% \n',pfn)
-fprintf('FALSE POSITIVE PERCENTAGE (by Author): %.1f%% \n\n',pfp)
-
 %% NATURAL FREQUENCY & KURTOSIS
 % LEARNING DATA - KURTOSIS - HEALTHY
 Xh = NatFreqh(learn)';
@@ -714,7 +633,6 @@ semilogy(valid,Disthv,'xk','MarkerSize',marker,'linewidth',2), hold on
 semilogy(rep+1:rep+5*rep,Distd,'dk','MarkerSize',marker,'MarkerFaceColor','r')
 yline(max(Disth),'--k','linewidth',2.5)
 yline(UCL,'k-.','linewidth', 2.5)
-yline((UCL+max(Disth))/2,'m:','linewidth', 2.5)
 grid on, grid minor
 xlabel('Tests') 
 ylabel('$\mathcal D^2$')
@@ -776,32 +694,6 @@ fprintf('PROBABILITY OF DETECTION (Empirical): %.1f%% \n',100*Re)
 fprintf('FALSE NEGATIVE PERCENTAGE (Empirical): %.1f%% \n',pfn)
 fprintf('FALSE POSITIVE PERCENTAGE (Empirical): %.1f%% \n\n',pfp)
 
-% PROPOSED BY AUTHOR
-fp = 0; % FALSE POSITIVE
-for i=1:length(valid)
-    if Disthv(i)>(UCL+max(Disth))/2
-        fp = 1+fp;
-    end
-end
-fn = 0; % FALSE NEGATIVE
-for i=1:5*rep
-    if Distd(i)<(UCL+max(Disth))/2
-        fn = 1+fn;
-    end
-end
-pfn = fn/(5*rep)*100;       % Rate of Error II
-pfp = fp/length(valid)*100; % Rate of Error I   
-tp = (5*rep)-fn;            % True Positive
-tn = length(valid)-fp;      % True Negative
-Pr = tp/(tp+fp);            % Precision 
-Re = tp/(tp+fn);            % Recall (Probability of Detecion)
-F1 = 2*(Pr*Re)/(Pr+Re);     % F1-score
-FPR = fp/(fp+tn);           % False Positive Rate
-TNR = tn/(fp+tn);           % True Negative Rate
-fprintf('PROBABILITY OF DETECTION (by Author): %.1f%% \n',100*Re)
-fprintf('FALSE NEGATIVE PERCENTAGE (by Author): %.1f%% \n',pfn)
-fprintf('FALSE POSITIVE PERCENTAGE (by Author): %.1f%% \n\n',pfp)
-
 %% NATURAL FREQUENCY & SKEWNESS
 % LEARNING DATA - SKEWNESS - HEALTHY
 Xh = NatFreqh(learn)';
@@ -844,7 +736,6 @@ semilogy(valid,Disthv,'xk','MarkerSize',marker,'linewidth',2), hold on
 semilogy(rep+1:rep+5*rep,Distd,'dk','MarkerSize',marker,'MarkerFaceColor','r')
 yline(max(Disth),'--k','linewidth',2.5)
 yline(UCL,'k-.','linewidth', 2.5)
-yline((UCL+max(Disth))/2,'m:','linewidth', 2.5)
 grid on, grid minor
 xlabel('Tests') 
 ylabel('$\mathcal D^2$')
@@ -906,39 +797,14 @@ fprintf('PROBABILITY OF DETECTION (Empirical): %.1f%% \n',100*Re)
 fprintf('FALSE NEGATIVE PERCENTAGE (Empirical): %.1f%% \n',pfn)
 fprintf('FALSE POSITIVE PERCENTAGE (Empirical): %.1f%% \n\n',pfp)
 
-% PROPOSED BY AUTHOR
-fp = 0; % FALSE POSITIVE
-for i=1:length(valid)
-    if Disthv(i)>(UCL+max(Disth))/2
-        fp = 1+fp;
-    end
-end
-fn = 0; % FALSE NEGATIVE
-for i=1:5*rep
-    if Distd(i)<(UCL+max(Disth))/2
-        fn = 1+fn;
-    end
-end
-pfn = fn/(5*rep)*100;       % Rate of Error II
-pfp = fp/length(valid)*100; % Rate of Error I   
-tp = (5*rep)-fn;            % True Positive
-tn = length(valid)-fp;      % True Negative
-Pr = tp/(tp+fp);            % Precision 
-Re = tp/(tp+fn);            % Recall (Probability of Detecion)
-F1 = 2*(Pr*Re)/(Pr+Re);     % F1-score
-FPR = fp/(fp+tn);           % False Positive Rate
-TNR = tn/(fp+tn);           % True Negative Rate
-fprintf('PROBABILITY OF DETECTION (by Author): %.1f%% \n',100*Re)
-fprintf('FALSE NEGATIVE PERCENTAGE (by Author): %.1f%% \n',pfn)
-fprintf('FALSE POSITIVE PERCENTAGE (by Author): %.1f%% \n\n',pfp)
-
-% fprintf('\t\t\t\t CONFUSION MATRIX\n')
-% fprintf('\t\t\t\t\t\t\t Actual Class\n')
-% fprintf('\t\t\t\t\t\t Damaged \t Healthy\n')
-% fprintf('\t\t\t\t\t\t---------------------\n')
-% fprintf('\t\t\t Damaged\t|\t %i \t\t %i\n',tp,fp)
-% fprintf('Predicted \t\t\t\t|\n')
-% fprintf('\t\t\t Healthy\t|\t %i \t\t %i\n',fn,tn)
+%% CONFUSION MATRIX
+fprintf('\t\t\t\t CONFUSION MATRIX\n')
+fprintf('\t\t\t\t\t\t\t Actual Class\n')
+fprintf('\t\t\t\t\t\t Damaged \t Healthy\n')
+fprintf('\t\t\t\t\t\t---------------------\n')
+fprintf('\t\t\t Damaged\t|\t %i \t\t %i\n',tp,fp)
+fprintf('Predicted \t\t\t\t|\n')
+fprintf('\t\t\t Healthy\t|\t %i \t\t %i\n',fn,tn)
 
 %% ROC CURVE
 n1 = 100;
