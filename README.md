@@ -3,7 +3,5 @@
 UNESP - FEIS - PPGEM
 
 Estevão Fuzaro de Almeida
-
-Mechanical Engineer
-
-Master's Student
+  Mechanical Engineer
+  Master's Student
